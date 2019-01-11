@@ -19,7 +19,7 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-import os
+import os, q
 import time
 import glob
 import re
@@ -110,13 +110,13 @@ class ActionModule(_ActionModule):
         if copy_result.get('changed', False):
             result['changed'] = copy_result['changed']
 
-        if result['changed']:
-            if not filename:
-                result['date'] = tstamp.split('@')[0]
-                result['time'] = tstamp.split('@')[1]
-            else:
-                result['date'] = time.strftime('%Y-%m-%d', time.gmtime(os.stat(result['backup_path']).st_ctime))
-                result['time'] = time.strftime('%H:%M:%S', time.gmtime(os.stat(result['backup_path']).st_ctime))
+        if not backup_options or not backup_options.get('filename'):
+            result['date'] = tstamp.split('@')[0]
+            result['time'] = tstamp.split('@')[1]
+            result['shortname'] = result['backup_path'][::-1].split('.', 1)[1][::-1]
+        else:
+            result['date'] = time.strftime('%Y-%m-%d', time.gmtime(os.stat(result['backup_path']).st_ctime))
+            result['time'] = time.strftime('%H:%M:%S', time.gmtime(os.stat(result['backup_path']).st_ctime))
 
         # strip out any keys that have two leading and two trailing
         # underscore characters
